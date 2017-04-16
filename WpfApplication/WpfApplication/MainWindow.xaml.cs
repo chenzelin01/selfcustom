@@ -25,7 +25,7 @@ namespace WpfApplication
 
     public partial class MainWindow : Window
     {
-        const bool DEBUG = true;
+        const bool DEBUG = false;
         public static String current_mode = BLUR;
         public const String BLUR = "blur";
         public const String REPLACE = "replace";
@@ -843,6 +843,9 @@ namespace WpfApplication
         public const String FILTER = " -f ";
         const int MAX_THREAD_NUM = 1;
         static int cur_thread_num = 0;
+        static Stack<object[]> event_queue = new Stack<object[]>();
+        static bool event_queue_mutex = false;
+        static bool event_handle_finish = true;
         public static String event_handler(String event_, String param){
             pre_handle_brefore_call_bkg_exe();
             switch (event_){
@@ -860,7 +863,7 @@ namespace WpfApplication
         }
         public static void event_handler_anys(String event_, String param, int delay = 0)
         {
-            if (cur_thread_num < MAX_THREAD_NUM)
+            /*if (cur_thread_num < MAX_THREAD_NUM)
             {
                 Thread thread = new Thread(event_handler);
                 object[] obj_ = new object[3];
@@ -868,10 +871,54 @@ namespace WpfApplication
                 obj_[1] = param;
                 obj_[2] = delay;
                 thread.Start(obj_);
+            }*/
+            //insert msg to event_queue ayns
+            while (event_queue_mutex)
+            {
+                Thread.Sleep(5);
+            }
+            object[] obj_ = new object[3];
+            obj_[0] = event_;
+            obj_[1] = param;
+            obj_[2] = delay;
+            event_queue_mutex = true;
+            if (event_queue.Count == 0 || event_queue.Peek() != obj_)
+            {
+                event_queue.Push(obj_);
+            }
+            event_queue_mutex = false;
+            if (event_handle_finish)
+            {
+                Thread thread = new Thread(event_handler_in_quenen);
+                thread.Start();
             }
         }
-
-        public static void event_handler(object obj)
+        //handler the event_exiting in the event_list
+        private static void event_handler_in_quenen()
+        {
+            event_handle_finish = false;
+            while (event_queue.Count > 0)
+            {
+                if (cur_thread_num < MAX_THREAD_NUM)
+                {
+                    while (event_queue_mutex)
+                    {
+                        Thread.Sleep(50);
+                    }
+                    Thread thread = new Thread(event_handler);
+                    event_queue_mutex = true;
+                    object[] last_msg = event_queue.Peek();
+                    thread.Start(last_msg);
+                    event_queue.Clear();
+                    event_queue_mutex = false;
+                    System.Diagnostics.Debug.WriteLine("msg param = " + last_msg[1].ToString());
+                }
+                Thread.Sleep(1000);
+                System.Diagnostics.Debug.WriteLine("event_queue_count = " +event_queue.Count);
+            }
+            event_handle_finish = true;
+        }
+        private static void event_handler(object obj)
         {
             cur_thread_num++;
 
