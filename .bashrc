@@ -173,15 +173,18 @@ esac
 # export HTTPS_PROXY="http://172.18.216.100:1080"
 export CUDA_VISIBLE_DEVICES=-1
 alias sss='~/launch.sh'
+alias taoke='~/taobaoke/taoke.sh'
 alias pip='sudo /anaconda3/bin/pip'
 alias zelin='rdesktop -a 24 -g 1280x800 -r clipboard:PRIMARYCLIPBOARD -r disk:Frdisk=/home/chenzelin -u zelin -p zelin 222.200.182.82'
-alias pyc='~/IdeaServer & sh ~/pycharm-2017.2/bin/pycharm.sh &'
+# alias pyc='~/IdeaServer & sh ~/pycharm-2017.2/bin/pycharm.sh &'
 # added by Anaconda3 4.4.0 installer
-export PATH="/home/chenzelin/.vim/pack/completor/start:/anaconda3/bin:$PATH"
+export PATH="/home/chenzelin/taobaoke:/home/chenzelin/.vim/pack/completor/start:/anaconda3/bin:$PATH"
 # change rm cmd to trash cmd
 alias rm='trash-put'
 alias rl='trash-list'
-alias pycharm='sh ~/pycharm-2017.2/bin/pycharm.sh'
+alias pycharm='sh ~/pycharm-2017.3/bin/pycharm.sh &'
+alias chrome='/usr/bin/google-chrome-stable %U &'
 alias python3="python"
+alias op="xdg-open"
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
